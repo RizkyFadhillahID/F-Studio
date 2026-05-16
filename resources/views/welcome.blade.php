@@ -1,11 +1,17 @@
 ﻿<!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>F-Studio API</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: #1a1a1a;
             color: #e5e5e5;
@@ -16,44 +22,51 @@
             justify-content: center;
             padding: 2rem;
         }
+
         .card {
             background-color: #242424;
             border-radius: 12px;
             padding: 2.5rem 3rem;
             max-width: 680px;
             width: 100%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
         }
+
         h1 {
             font-size: 1.75rem;
             font-weight: 700;
             color: #ffffff;
             margin-bottom: 0.5rem;
         }
+
         .subtitle {
             color: #9ca3af;
             font-size: 0.95rem;
             margin-bottom: 1rem;
             line-height: 1.5;
         }
+
         .api-root {
             font-family: 'Courier New', monospace;
             font-size: 0.85rem;
             color: #9ca3af;
             margin-bottom: 2rem;
         }
+
         .api-root span {
             background: #333;
             padding: 2px 8px;
             border-radius: 4px;
             color: #e5e5e5;
         }
+
         h2 {
             font-size: 1.15rem;
             font-weight: 700;
             color: #ffffff;
             margin-bottom: 1rem;
         }
+
         .endpoint-list {
             list-style: disc;
             padding-left: 1.4rem;
@@ -62,20 +75,24 @@
             gap: 0.55rem;
             margin-bottom: 2rem;
         }
+
         .endpoint-list li {
             font-size: 0.9rem;
             color: #d1d5db;
             line-height: 1.6;
         }
+
         .endpoint-list li strong {
             color: #ffffff;
             font-weight: 600;
         }
+
         .endpoint-list code {
             font-family: 'Courier New', monospace;
             font-size: 0.82rem;
             color: #93c5fd;
         }
+
         .btn-login {
             display: inline-block;
             background-color: #3b82f6;
@@ -87,9 +104,11 @@
             text-decoration: none;
             transition: background-color 0.2s;
         }
+
         .btn-login:hover {
             background-color: #2563eb;
         }
+
         hr {
             border: none;
             border-top: 1px solid #333;
@@ -97,6 +116,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="card">
         <h1>F-Studio Management System</h1>
@@ -177,4 +197,5 @@
         <a href="{{ route('login') }}" class="btn-login">Login ke F-Studio</a>
     </div>
 </body>
+
 </html>
