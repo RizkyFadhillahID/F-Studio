@@ -1,0 +1,776 @@
+{
+	"info": {
+		"_postman_id": "f-studio-api-collection",
+		"name": "F-Studio API",
+		"description": "Koleksi endpoint API F-Studio (Laravel Sanctum)\n\nCara penggunaan:\n1. Set variabel `base_url` ke URL server, contoh: `http://localhost:8000`\n2. Jalankan request **Auth / Login** terlebih dahulu\n3. Token akan otomatis tersimpan di variabel `token`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json.success && json.data && json.data.token) {",
+									"    pm.collectionVariables.set('token', json.data.token);",
+									"    console.log('Token tersimpan: ' + json.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@fstudio.com\",\n    \"password\": \"password\",\n    \"device_name\": \"Postman\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Login dan dapatkan Bearer token. Token otomatis disimpan ke variabel `token`.\n\n**Body:**\n- `email` (required)\n- `password` (required, min:8)\n- `device_name` (required)"
+					}
+				},
+				{
+					"name": "Get Profile (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "me"]
+						},
+						"description": "Ambil data profil pengguna yang sedang login."
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						},
+						"description": "Hapus token saat ini (logout)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories?search=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories"],
+							"query": [
+								{ "key": "search", "value": "", "description": "Filter by name" },
+								{ "key": "per_page", "value": "15" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Category (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Kategori Baru\",\n    \"description\": \"Deskripsi kategori\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories"]
+						},
+						"description": "**Admin only.** Body:\n- `name` (required, unique)\n- `description` (nullable)"
+					}
+				},
+				{
+					"name": "Update Category (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Nama Diperbarui\",\n    \"description\": \"Deskripsi diperbarui\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Category (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Equipment",
+			"item": [
+				{
+					"name": "Get All Equipment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment?search=&category_id=&condition=&available=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment"],
+							"query": [
+								{ "key": "search", "value": "", "description": "Filter by name/code" },
+								{ "key": "category_id", "value": "", "description": "Filter by category" },
+								{ "key": "condition", "value": "", "description": "excellent|good|fair|poor|maintenance" },
+								{ "key": "available", "value": "", "description": "true|1 untuk tampilkan yang tersedia" },
+								{ "key": "per_page", "value": "15" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Equipment by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Equipment (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Kamera Canon EOS", "type": "text" },
+								{ "key": "code", "value": "CAM-001", "type": "text" },
+								{ "key": "category_id", "value": "1", "type": "text" },
+								{ "key": "quantity_total", "value": "3", "type": "text" },
+								{ "key": "quantity_available", "value": "3", "type": "text" },
+								{ "key": "condition", "value": "good", "type": "text", "description": "excellent|good|fair|poor|maintenance" },
+								{ "key": "description", "value": "Kamera DSLR untuk dokumentasi", "type": "text" },
+								{ "key": "is_active", "value": "1", "type": "text" },
+								{ "key": "image", "value": "", "type": "file", "disabled": true }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment"]
+						},
+						"description": "**Admin only.** Mendukung upload gambar (multipart/form-data)."
+					}
+				},
+				{
+					"name": "Update Equipment (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "_method", "value": "PUT", "type": "text" },
+								{ "key": "name", "value": "Kamera Canon EOS Updated", "type": "text" },
+								{ "key": "condition", "value": "excellent", "type": "text" },
+								{ "key": "image", "value": "", "type": "file", "disabled": true }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment", "1"]
+						},
+						"description": "Gunakan `_method: PUT` jika perlu upload file bersamaan."
+					}
+				},
+				{
+					"name": "Delete Equipment (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Rooms",
+			"item": [
+				{
+					"name": "Get All Rooms",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/rooms?search=&available_on=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "rooms"],
+							"query": [
+								{ "key": "search", "value": "", "description": "Filter by name/code" },
+								{ "key": "available_on", "value": "", "description": "Tanggal YYYY-MM-DD, cek ruang tersedia" },
+								{ "key": "per_page", "value": "15" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Room by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/rooms/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "rooms", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Room (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Ruang Studio A", "type": "text" },
+								{ "key": "code", "value": "STU-A", "type": "text" },
+								{ "key": "description", "value": "Ruang studio utama", "type": "text" },
+								{ "key": "capacity", "value": "20", "type": "text" },
+								{ "key": "facilities[]", "value": "AC", "type": "text" },
+								{ "key": "facilities[]", "value": "Projector", "type": "text" },
+								{ "key": "is_active", "value": "1", "type": "text" },
+								{ "key": "image", "value": "", "type": "file", "disabled": true }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/rooms",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "rooms"]
+						},
+						"description": "**Admin only.**\n- `facilities` dikirim sebagai array"
+					}
+				},
+				{
+					"name": "Update Room (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "_method", "value": "PUT", "type": "text" },
+								{ "key": "name", "value": "Ruang Studio A Updated", "type": "text" },
+								{ "key": "capacity", "value": "25", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/rooms/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "rooms", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Room (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/rooms/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "rooms", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings?status=&room_id=&user_id=&date_from=&date_to=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings"],
+							"query": [
+								{ "key": "status", "value": "", "description": "pending|approved|rejected|cancelled|completed" },
+								{ "key": "room_id", "value": "" },
+								{ "key": "user_id", "value": "", "description": "Admin only" },
+								{ "key": "date_from", "value": "", "description": "YYYY-MM-DD" },
+								{ "key": "date_to", "value": "", "description": "YYYY-MM-DD" },
+								{ "key": "per_page", "value": "15" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"room_id\": 1,\n    \"title\": \"Rapat Bulanan\",\n    \"start_datetime\": \"2026-06-01 09:00:00\",\n    \"end_datetime\": \"2026-06-01 11:00:00\",\n    \"notes\": \"Tolong siapkan proyektor\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings"]
+						},
+						"description": "Body:\n- `room_id` (required)\n- `title` (required, max:200)\n- `start_datetime` (required, after:now)\n- `end_datetime` (required, after:start_datetime)\n- `notes` (nullable)"
+					}
+				},
+				{
+					"name": "Update Booking",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Rapat Diperbarui\",\n    \"start_datetime\": \"2026-06-01 10:00:00\",\n    \"end_datetime\": \"2026-06-01 12:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings", "1"]
+						},
+						"description": "Hanya bisa diubah oleh pemilik dan status masih `pending`."
+					}
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings", "1"]
+						}
+					}
+				},
+				{
+					"name": "Approve Booking (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings", "1", "approve"]
+						}
+					}
+				},
+				{
+					"name": "Reject Booking (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rejection_reason\": \"Ruang tidak tersedia pada waktu tersebut\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bookings/1/reject",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bookings", "1", "reject"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Equipment Loans",
+			"item": [
+				{
+					"name": "Get All Loans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment-loans?status=&user_id=&due_date_from=&due_date_to=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment-loans"],
+							"query": [
+								{ "key": "status", "value": "", "description": "pending|approved|rejected|active|returned|overdue" },
+								{ "key": "user_id", "value": "", "description": "Admin only" },
+								{ "key": "due_date_from", "value": "", "description": "YYYY-MM-DD" },
+								{ "key": "due_date_to", "value": "", "description": "YYYY-MM-DD" },
+								{ "key": "per_page", "value": "15" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Loan by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment-loans/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment-loans", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Loan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purpose\": \"Keperluan dokumentasi acara\",\n    \"due_date\": \"2026-06-10\",\n    \"notes\": \"Harap dijaga dengan baik\",\n    \"booking_id\": null,\n    \"items\": [\n        {\n            \"equipment_id\": 1,\n            \"quantity\": 2,\n            \"notes\": \"Lengkap dengan baterai\"\n        },\n        {\n            \"equipment_id\": 3,\n            \"quantity\": 1,\n            \"notes\": null\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment-loans",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment-loans"]
+						},
+						"description": "Body:\n- `purpose` (required)\n- `due_date` (required, after_or_equal:today)\n- `booking_id` (nullable)\n- `notes` (nullable)\n- `items` (required array min:1)\n  - `items.*.equipment_id` (required)\n  - `items.*.quantity` (required, min:1)\n  - `items.*.notes` (nullable)"
+					}
+				},
+				{
+					"name": "Update Loan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purpose\": \"Keperluan diperbarui\",\n    \"due_date\": \"2026-06-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment-loans/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment-loans", "1"]
+						},
+						"description": "Hanya bisa diubah oleh pemilik dan status masih `pending`."
+					}
+				},
+				{
+					"name": "Approve Loan (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment-loans/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment-loans", "1", "approve"]
+						}
+					}
+				},
+				{
+					"name": "Reject Loan (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rejection_reason\": \"Stok peralatan tidak mencukupi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/equipment-loans/1/reject",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "equipment-loans", "1", "reject"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Check-ins",
+			"item": [
+				{
+					"name": "Get All Check-ins (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/check-ins?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "check-ins"],
+							"query": [
+								{ "key": "per_page", "value": "15" }
+							]
+						},
+						"description": "**Admin only.**"
+					}
+				},
+				{
+					"name": "Get Check-in by ID (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/check-ins/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "check-ins", "1"]
+						},
+						"description": "**Admin only.**"
+					}
+				},
+				{
+					"name": "Store Check-in / Check-out",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"loan_code\": \"LOAN-20260601-0001\",\n    \"action\": \"check_in\",\n    \"device_id\": \"scanner-01\",\n    \"notes\": \"Peralatan dalam kondisi baik\",\n    \"latitude\": -6.200000,\n    \"longitude\": 106.816666,\n    \"item_conditions\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/check-ins",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "check-ins"]
+						},
+						"description": "Body:\n- `loan_code` (required, exists)\n- `action` (required: `check_in` | `check_out`)\n- `device_id` (nullable)\n- `notes` (nullable)\n- `latitude` / `longitude` (nullable)\n- `item_conditions` (required jika `action = check_out`)\n  - `item_conditions.*.item_id`\n  - `item_conditions.*.condition` (excellent|good|fair|poor|maintenance)\n  - `item_conditions.*.notes`\n\n**Contoh check_out:**\n```json\n{\n    \"loan_code\": \"LOAN-20260601-0001\",\n    \"action\": \"check_out\",\n    \"item_conditions\": [\n        {\"item_id\": 1, \"condition\": \"good\", \"notes\": null}\n    ]\n}\n```"
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get All Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications"],
+							"query": [
+								{ "key": "per_page", "value": "15" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/1/read",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "1", "read"]
+						}
+					}
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/read-all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "read-all"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
