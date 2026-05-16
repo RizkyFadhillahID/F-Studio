@@ -28,8 +28,7 @@
                         <option value="">-- Pilih --</option>
                         @foreach ($categories as $cat)
                             <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
-                                {{ $cat->name }}
-                            </option>
+                                {{ $cat->name }}</option>
                         @endforeach
                     </select>
                     @error('category_id')

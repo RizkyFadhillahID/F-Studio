@@ -17,8 +17,7 @@
                 </div>
                 <div style="background:rgba(233,69,96,.25); border-radius:12px; padding:10px 14px; text-align:center;">
                     <div style="font-size:1.6rem; font-weight:800; color:#e94560;">
-                        {{ \App\Helpers\DateHelper::formatTimeID(now()) }}
-                    </div>
+                        {{ \App\Helpers\DateHelper::formatTimeID(now()) }}</div>
                     <div style="font-size:.65rem; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">WIB</div>
                 </div>
             </div>
@@ -146,11 +145,11 @@
         // Auto-polling setiap 30 detik untuk update angka statistik tanpa reload
         function pollStats() {
             fetch('{{ route('receptionist.stats') }}', {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
                 .then(r => r.ok ? r.json() : null)
                 .then(data => {
                     if (!data) return;
@@ -170,7 +169,7 @@
                         }
                     });
                 })
-                .catch(() => { }); // silent fail
+                .catch(() => {}); // silent fail
         }
         setInterval(pollStats, 30000);
     </script>

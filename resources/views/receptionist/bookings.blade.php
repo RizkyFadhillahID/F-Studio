@@ -30,8 +30,8 @@
             @if (request('status'))
                 <input type="hidden" name="status" value="{{ request('status') }}">
             @endif
-            <input type="date" name="date" class="form-control form-control-sm" style="border-radius:8px; max-width:180px;"
-                value="{{ request('date') }}">
+            <input type="date" name="date" class="form-control form-control-sm"
+                style="border-radius:8px; max-width:180px;" value="{{ request('date') }}">
             <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
                 <i class="bi bi-funnel"></i> Filter
             </button>

@@ -49,7 +49,8 @@
                                 <i class="bi bi-building me-1"></i>{{ $b->room->name }}
                             </div>
                         </div>
-                        <span class="badge badge-{{ $b->status }}" style="font-size:.72rem; border-radius:6px; padding:4px 10px;">
+                        <span class="badge badge-{{ $b->status }}"
+                            style="font-size:.72rem; border-radius:6px; padding:4px 10px;">
                             {{ ucfirst($b->status) }}
                         </span>
                     </div>

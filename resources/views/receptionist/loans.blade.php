@@ -5,8 +5,7 @@
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h5 class="fw-bold mb-0" style="color:var(--dark)"><i class="bi bi-box-seam-fill"
-                    style="color:var(--accent)"></i>
+            <h5 class="fw-bold mb-0" style="color:var(--dark)"><i class="bi bi-box-seam-fill" style="color:var(--accent)"></i>
                 Peminjaman Peralatan</h5>
             <small class="text-muted">Ajukan peminjaman peralatan untuk tamu</small>
         </div>
@@ -30,7 +29,7 @@
             <div class="booking-card mb-2">
                 <div class="d-flex">
                     <div
-                        class="bc-border {{ match ($loan->status) { 'pending' => 'pending', 'approved', 'active' => 'approved', 'rejected' => 'rejected', default => 'cancelled'} }}">
+                        class="bc-border {{ match ($loan->status) {'pending' => 'pending','approved', 'active' => 'approved','rejected' => 'rejected',default => 'cancelled'} }}">
                     </div>
                     <div class="p-3 flex-grow-1">
                         <div class="d-flex justify-content-between align-items-start">

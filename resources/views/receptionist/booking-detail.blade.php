@@ -14,7 +14,7 @@
                 <div>
                     <span class="badge badge-{{ $booking->status }}"
                         style="font-size:.8rem; padding:5px 12px; border-radius:8px; margin-bottom:8px; display:inline-block;">
-                        @php $statusLabels = ['pending' => 'Menunggu Persetujuan', 'approved' => 'Disetujui', 'rejected' => 'Ditolak', 'cancelled' => 'Dibatalkan', 'completed' => 'Selesai'] @endphp
+                        @php $statusLabels = ['pending'=>'Menunggu Persetujuan','approved'=>'Disetujui','rejected'=>'Ditolak','cancelled'=>'Dibatalkan','completed'=>'Selesai'] @endphp
                         <i
                             class="bi bi-{{ $booking->status === 'approved' ? 'check-circle-fill' : ($booking->status === 'rejected' ? 'x-circle-fill' : ($booking->status === 'pending' ? 'clock-fill' : 'dash-circle-fill')) }} me-1"></i>
                         {{ $statusLabels[$booking->status] ?? ucfirst($booking->status) }}
@@ -119,7 +119,8 @@
 
     {{-- Respons Admin --}}
     @if ($booking->approvedBy || $booking->admin_notes)
-        <div class="rc-card mb-3" style="border-left: 4px solid {{ $booking->status === 'approved' ? '#198754' : '#dc3545' }}">
+        <div class="rc-card mb-3"
+            style="border-left: 4px solid {{ $booking->status === 'approved' ? '#198754' : '#dc3545' }}">
             <div class="rc-card-header"
                 style="background: {{ $booking->status === 'approved' ? '#d1e7dd; color:#0f5132' : '#f8d7da; color:#842029' }}">
                 <i class="bi bi-{{ $booking->status === 'approved' ? 'check-circle-fill' : 'x-circle-fill' }} me-2"></i>

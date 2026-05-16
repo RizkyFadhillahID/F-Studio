@@ -15,8 +15,7 @@
             </div>
             <div class="mb-4">
                 <label class="form-label fw-semibold">Deskripsi</label>
-                <textarea name="description" rows="3"
-                    class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+                <textarea name="description" rows="3" class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
                 @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror

@@ -21,8 +21,7 @@
                 @endif
                 @if ($room->hourly_rate)
                     <div class="col-6"><i class="bi bi-tag-fill me-1"></i> Rp
-                        {{ number_format($room->hourly_rate, 0, ',', '.') }}/jam
-                    </div>
+                        {{ number_format($room->hourly_rate, 0, ',', '.') }}/jam</div>
                 @endif
             </div>
             <a href="{{ route('receptionist.book', $room) }}" class="btn btn-accent w-100 mt-3" style="border-radius:10px;">
@@ -68,7 +67,8 @@
                                 {{ $b->title }}
                             </div>
                         </div>
-                        <span class="badge badge-{{ $b->status }}" style="font-size:.7rem; border-radius:6px; padding:4px 8px;">
+                        <span class="badge badge-{{ $b->status }}"
+                            style="font-size:.7rem; border-radius:6px; padding:4px 8px;">
                             {{ ucfirst($b->status) }}
                         </span>
                     </div>

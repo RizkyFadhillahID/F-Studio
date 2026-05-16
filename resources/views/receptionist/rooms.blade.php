@@ -39,7 +39,8 @@
                         <div class="room-card-header">
                             <div class="fw-bold" style="font-size:.92rem; line-height:1.3;">{{ $room->name }}</div>
                             @if ($room->room_code)
-                                <code style="font-size:.72rem; opacity:.7; display:block; margin-top:2px;">{{ $room->room_code }}</code>
+                                <code
+                                    style="font-size:.72rem; opacity:.7; display:block; margin-top:2px;">{{ $room->room_code }}</code>
                             @endif
                         </div>
                         <div class="room-card-body">

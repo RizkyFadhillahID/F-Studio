@@ -31,8 +31,8 @@
                 @endif
                 <tr>
                     <th>Resepsionis</th>
-                    <td>{{ $booking->user->name }} <span class="badge bg-secondary" style="font-size:.65rem;">Resepsionis</span>
-                    </td>
+                    <td>{{ $booking->user->name }} <span class="badge bg-secondary"
+                            style="font-size:.65rem;">Resepsionis</span></td>
                 </tr>
             @else
                 <tr>
@@ -62,8 +62,7 @@
                 <tr>
                     <th>Disetujui oleh</th>
                     <td>{{ $booking->approvedBy->name }} pada
-                        {{ \App\Helpers\DateHelper::formatDateTimeID($booking->approved_at) }}
-                    </td>
+                        {{ \App\Helpers\DateHelper::formatDateTimeID($booking->approved_at) }}</td>
                 </tr>
             @endif
         </table>
@@ -122,7 +121,8 @@
                     <div class="col-sm-6">
                         <label class="form-label small mb-1">Catatan Admin</label>
                         <input type="text" name="admin_notes" class="form-control form-control-sm"
-                            placeholder="Alasan perubahan (opsional)" value="{{ old('admin_notes', $booking->admin_notes) }}">
+                            placeholder="Alasan perubahan (opsional)"
+                            value="{{ old('admin_notes', $booking->admin_notes) }}">
                     </div>
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-primary btn-sm w-100">Simpan</button>
