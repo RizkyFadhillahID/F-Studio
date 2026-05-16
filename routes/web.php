@@ -16,6 +16,13 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : view('welcome');
 });
 
+Route::get('/postman-collection', function () {
+    $file = base_path('tests/F-Studio-API.postman_collection.json');
+    return response()->download($file, 'F-Studio-API.postman_collection.json', [
+        'Content-Type' => 'application/json',
+    ]);
+})->name('postman.collection');
+
 // ─── Guest Routes ─────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
