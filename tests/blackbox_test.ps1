@@ -30,7 +30,7 @@ function reqRaw {
     $params = @{ Method=$method; Uri="$BASE$path"; Headers=$headers; ErrorAction="SilentlyContinue" }
     if ($body) { $params["Body"] = ($body | ConvertTo-Json -Depth 5) }
     try {
-        $resp = Invoke-WebRequest @params
+        $resp = Invoke-WebRequest @params -UseBasicParsing
         return @{ status=$resp.StatusCode; body=($resp.Content | ConvertFrom-Json) }
     } catch {
         $status = $_.Exception.Response.StatusCode.value__
@@ -344,9 +344,60 @@ check "Notifications: list → 200" $r.status 200
 $notifCount = $r.body.meta.total
 Write-Host "  [INFO] Notifikasi member: $notifCount" -ForegroundColor Yellow
 
+# Mark single notification as read
+if ($r.body.data -and $r.body.data.Count -gt 0) {
+    $notifId = $r.body.data[0].id
+    $r2 = reqRaw POST "/notifications/$notifId/read" -token $MEMBER_TOKEN
+    check "Notifications: markOneRead → 200" $r2.status 200
+}
+
 # Mark all as read
 $r = reqRaw POST "/notifications/read-all" -token $MEMBER_TOKEN
 check "Notifications: markAllRead → 200" $r.status 200
+
+# ──────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
+section "8b. MISSING ENDPOINT COVERAGE"
+
+# Booking: update (still pending — create a fresh one)
+$start3 = (Get-Date).AddDays(5).ToString("yyyy-MM-dd") + " 14:00:00"
+$end3   = (Get-Date).AddDays(5).ToString("yyyy-MM-dd") + " 16:00:00"
+$r = reqRaw POST "/bookings" @{
+    room_id=$ROOM_ID; title="Booking Update Test"
+    start_datetime=$start3; end_datetime=$end3
+} -token $MEMBER_TOKEN
+$BOOKING_UPDATE_ID = $r.body.data.id
+$r = reqRaw PUT "/bookings/$BOOKING_UPDATE_ID" @{ title="Judul Diperbarui"; notes="Update test" } -token $MEMBER_TOKEN
+check "Bookings: update own pending → 200" $r.status 200
+check "Bookings: title updated" $r.body.data.title "Judul Diperbarui"
+
+# Booking: delete (cancel) own pending
+$r = reqRaw DELETE "/bookings/$BOOKING_UPDATE_ID" -token $MEMBER_TOKEN
+check "Bookings: cancel own pending → 200" $r.status 200
+
+# Equipment Loan: show by ID
+$r = reqRaw GET "/equipment-loans/$LOAN_ID" -token $MEMBER_TOKEN
+check "Loans: show by ID → 200" $r.status 200
+
+# Equipment Loan: update (need pending loan)
+$dueDt2 = (Get-Date).AddDays(10).ToString("yyyy-MM-dd")
+$eqList2 = req GET "/equipment" -token $MEMBER_TOKEN
+$eq3 = $eqList2.data[0]
+$r = reqRaw POST "/equipment-loans" @{
+    purpose="Loan for update test"; due_date=$dueDt2
+    items=@(@{ equipment_id=$eq3.id; quantity=1 })
+} -token $MEMBER_TOKEN
+$LOAN_UPDATE_ID = $r.body.data.id
+$r = reqRaw PUT "/equipment-loans/$LOAN_UPDATE_ID" @{ purpose="Updated purpose"; due_date=$dueDt2 } -token $MEMBER_TOKEN
+check "Loans: update own pending → 200" $r.status 200
+
+# Check-in: admin show by ID
+$ciList = req GET "/check-ins" -token $ADMIN_TOKEN
+if ($ciList.data -and $ciList.data.Count -gt 0) {
+    $ciId = $ciList.data[0].id
+    $r = reqRaw GET "/check-ins/$ciId" -token $ADMIN_TOKEN
+    check "CheckIns: admin show by ID → 200" $r.status 200
+}
 
 # ──────────────────────────────────────────────────────────────
 section "9. RBAC & SECURITY"
@@ -377,7 +428,7 @@ section "10. WEB ROUTES"
 
 function web { param($path)
     try {
-        $r = Invoke-WebRequest -Uri "http://127.0.0.1:8000$path" -MaximumRedirection 0 -ErrorAction SilentlyContinue
+        $r = Invoke-WebRequest -Uri "http://127.0.0.1:8000$path" -MaximumRedirection 0 -UseBasicParsing -ErrorAction SilentlyContinue
         return $r.StatusCode
     } catch {
         return $_.Exception.Response.StatusCode.value__
@@ -386,7 +437,7 @@ function web { param($path)
 $code = web "/login"
 check "Web: GET /login → 200" $code 200
 $code = web "/"
-check "Web: GET / unauthenticated → redirect (302)" $code 302
+check "Web: GET / unauthenticated → 200 (landing page)" $code 200
 $code = web "/dashboard"
 check "Web: GET /dashboard unauthenticated → redirect (302)" $code 302
 
