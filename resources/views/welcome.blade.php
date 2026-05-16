@@ -119,41 +119,56 @@
             <li>
                 <strong>Categories:</strong>
                 <code>GET /api/v1/categories</code>,
+                <code>GET /api/v1/categories/{id}</code>,
                 <code>POST /api/v1/categories</code>,
-                <code>PUT /api/v1/categories/{id}</code>
+                <code>PUT /api/v1/categories/{id}</code>,
+                <code>DELETE /api/v1/categories/{id}</code>
             </li>
             <li>
                 <strong>Equipment:</strong>
                 <code>GET /api/v1/equipment</code>,
+                <code>GET /api/v1/equipment/{id}</code>,
                 <code>POST /api/v1/equipment</code>,
-                <code>PUT /api/v1/equipment/{id}</code>
+                <code>PUT /api/v1/equipment/{id}</code>,
+                <code>DELETE /api/v1/equipment/{id}</code>
             </li>
             <li>
                 <strong>Rooms:</strong>
                 <code>GET /api/v1/rooms</code>,
+                <code>GET /api/v1/rooms/{id}</code>,
                 <code>POST /api/v1/rooms</code>,
-                <code>PUT /api/v1/rooms/{id}</code>
+                <code>PUT /api/v1/rooms/{id}</code>,
+                <code>DELETE /api/v1/rooms/{id}</code>
             </li>
             <li>
                 <strong>Bookings:</strong>
                 <code>GET /api/v1/bookings</code>,
                 <code>POST /api/v1/bookings</code>,
-                <code>POST /api/v1/bookings/{id}/approve</code>
+                <code>GET /api/v1/bookings/{id}</code>,
+                <code>PUT /api/v1/bookings/{id}</code>,
+                <code>DELETE /api/v1/bookings/{id}</code>,
+                <code>POST /api/v1/bookings/{id}/approve</code>,
+                <code>POST /api/v1/bookings/{id}/reject</code>
             </li>
             <li>
                 <strong>Equipment Loans:</strong>
                 <code>GET /api/v1/equipment-loans</code>,
                 <code>POST /api/v1/equipment-loans</code>,
-                <code>POST /api/v1/equipment-loans/{id}/approve</code>
+                <code>GET /api/v1/equipment-loans/{id}</code>,
+                <code>PUT /api/v1/equipment-loans/{id}</code>,
+                <code>POST /api/v1/equipment-loans/{id}/approve</code>,
+                <code>POST /api/v1/equipment-loans/{id}/reject</code>
             </li>
             <li>
                 <strong>Check-ins:</strong>
                 <code>POST /api/v1/check-ins</code>,
-                <code>GET /api/v1/check-ins</code>
+                <code>GET /api/v1/check-ins</code>,
+                <code>GET /api/v1/check-ins/{id}</code>
             </li>
             <li>
                 <strong>Notifications:</strong>
                 <code>GET /api/v1/notifications</code>,
+                <code>POST /api/v1/notifications/{id}/read</code>,
                 <code>POST /api/v1/notifications/read-all</code>
             </li>
         </ul>
