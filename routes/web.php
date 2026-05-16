@@ -29,7 +29,6 @@ Route::middleware(['auth', 'account.active'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
-    Route::redirect('/', '/dashboard');
 
     // Admin only routes
     Route::middleware('role:admin')->group(function () {

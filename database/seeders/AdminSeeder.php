@@ -32,5 +32,17 @@ class AdminSeeder extends Seeder
                 'phone'     => '081298765432',
             ]
         );
+
+        // Member
+        User::updateOrCreate(
+            ['email' => 'member@fstudio.id'],
+            [
+                'name'      => 'Member Test',
+                'password'  => Hash::make('password123'),
+                'role'      => 'member',
+                'is_active' => true,
+                'phone'     => '081200000001',
+            ]
+        );
     }
 }
