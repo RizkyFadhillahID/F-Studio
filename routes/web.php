@@ -11,6 +11,11 @@ use App\Http\Controllers\Web\RoomController;
 use App\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
 
+// ─── Public Landing Page ──────────────────────────────────────────────────────
+Route::get('/', function () {
+    return auth()->check() ? redirect()->route('dashboard') : view('welcome');
+});
+
 // ─── Guest Routes ─────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
@@ -22,9 +27,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'account.active'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
-    Route::redirect('/dashboard', '/');
+    Route::redirect('/', '/dashboard');
 
     // Admin only routes
     Route::middleware('role:admin')->group(function () {
