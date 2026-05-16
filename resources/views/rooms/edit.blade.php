@@ -29,7 +29,8 @@
                 </div>
                 <div class="col-12">
                     <label class="form-label fw-semibold">Deskripsi</label>
-                    <textarea name="description" rows="2" class="form-control">{{ old('description', $room->description) }}</textarea>
+                    <textarea name="description" rows="2"
+                        class="form-control">{{ old('description', $room->description) }}</textarea>
                 </div>
                 <div class="col-12">
                     <label class="form-label fw-semibold">Fasilitas <small class="text-muted">(pisahkan dengan

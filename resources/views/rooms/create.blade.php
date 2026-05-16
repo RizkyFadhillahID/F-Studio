@@ -24,8 +24,8 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Kapasitas</label>
-                    <input type="number" name="capacity" value="{{ old('capacity', 1) }}" min="1"
-                        class="form-control" required>
+                    <input type="number" name="capacity" value="{{ old('capacity', 1) }}" min="1" class="form-control"
+                        required>
                 </div>
                 <div class="col-12">
                     <label class="form-label fw-semibold">Deskripsi</label>

@@ -15,7 +15,8 @@
             </div>
             <div class="mb-4">
                 <label class="form-label fw-semibold">Deskripsi</label>
-                <textarea name="description" rows="3" class="form-control">{{ old('description', $category->description) }}</textarea>
+                <textarea name="description" rows="3"
+                    class="form-control">{{ old('description', $category->description) }}</textarea>
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn text-white" style="background:#e94560">Update</button>

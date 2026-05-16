@@ -105,8 +105,7 @@
                         <label for="title" class="form-label">
                             Judul / Keperluan <span style="color:#e94560;">*</span>
                         </label>
-                        <input type="text" id="title" name="title"
-                            class="form-control @error('title') is-invalid @enderror"
+                        <input type="text" id="title" name="title" class="form-control @error('title') is-invalid @enderror"
                             placeholder="Contoh: Sesi Foto Produk, Rapat Tim, Seminar..." value="{{ old('title') }}"
                             required>
                         @error('title')
@@ -121,8 +120,8 @@
                             </label>
                             <input type="datetime-local" id="start_datetime" name="start_datetime"
                                 class="form-control @error('start_datetime') is-invalid @enderror"
-                                value="{{ old('start_datetime') }}"
-                                min="{{ now()->addMinutes(30)->format('Y-m-d\TH:i') }}" required>
+                                value="{{ old('start_datetime') }}" min="{{ now()->addMinutes(30)->format('Y-m-d\TH:i') }}"
+                                required>
                             @error('start_datetime')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -179,12 +178,10 @@
                             <div id="bookingItemsContainer">
                                 <div class="bk-item-row d-flex gap-2 mb-2 align-items-start" data-index="0">
                                     <div class="flex-grow-1">
-                                        <select name="equipment_items[0][equipment_id]"
-                                            class="form-select bk-equip-select">
+                                        <select name="equipment_items[0][equipment_id]" class="form-select bk-equip-select">
                                             <option value="">— Pilih Peralatan —</option>
                                             @foreach ($equipment as $eq)
-                                                <option value="{{ $eq->id }}"
-                                                    data-max="{{ $eq->quantity_available }}">
+                                                <option value="{{ $eq->id }}" data-max="{{ $eq->quantity_available }}">
                                                     {{ $eq->name }} — Tersedia: {{ $eq->quantity_available }}
                                                 </option>
                                             @endforeach
@@ -192,8 +189,8 @@
                                     </div>
                                     <div style="width:90px">
                                         <input type="number" name="equipment_items[0][quantity]"
-                                            class="form-control text-center bk-qty-input" value="1" min="1"
-                                            max="20" placeholder="Qty">
+                                            class="form-control text-center bk-qty-input" value="1" min="1" max="20"
+                                            placeholder="Qty">
                                     </div>
                                     <button type="button" class="btn btn-outline-danger btn-sm" style="height:38px"
                                         onclick="removeBkRow(this)" disabled>
@@ -249,7 +246,7 @@
             info.style.display = 'block';
         }
 
-        startEl.addEventListener('change', function() {
+        startEl.addEventListener('change', function () {
             // Auto-set end = start + 2 jam
             if (this.value && !endEl.value) {
                 const s = new Date(this.value);
@@ -264,8 +261,8 @@
         // ── Peralatan Tambahan (Equipment section) ──
         let bkRowIndex = 0;
         const bkEquipOptions = {!! isset($equipment)
-            ? $equipment->map(fn($e) => ['id' => $e->id, 'name' => $e->name, 'qty' => $e->quantity_available])->toJson()
-            : '[]' !!};
+        ? $equipment->map(fn($e) => ['id' => $e->id, 'name' => $e->name, 'qty' => $e->quantity_available])->toJson()
+        : '[]' !!};
 
         function toggleEquipment(btn) {
             const section = document.getElementById('equipmentSection');
@@ -290,19 +287,19 @@
             row.className = 'bk-item-row d-flex gap-2 mb-2 align-items-start';
             row.dataset.index = bkRowIndex;
             row.innerHTML = `
-                <div class="flex-grow-1">
-                    <select name="equipment_items[${bkRowIndex}][equipment_id]" class="form-select bk-equip-select">
-                        ${buildBkOptions()}
-                    </select>
-                </div>
-                <div style="width:90px">
-                    <input type="number" name="equipment_items[${bkRowIndex}][quantity]"
-                        class="form-control text-center bk-qty-input" value="1" min="1" max="20" placeholder="Qty">
-                </div>
-                <button type="button" class="btn btn-outline-danger btn-sm"
-                    style="height:38px" onclick="removeBkRow(this)">
-                    <i class="bi bi-trash"></i>
-                </button>`;
+                    <div class="flex-grow-1">
+                        <select name="equipment_items[${bkRowIndex}][equipment_id]" class="form-select bk-equip-select">
+                            ${buildBkOptions()}
+                        </select>
+                    </div>
+                    <div style="width:90px">
+                        <input type="number" name="equipment_items[${bkRowIndex}][quantity]"
+                            class="form-control text-center bk-qty-input" value="1" min="1" max="20" placeholder="Qty">
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm"
+                        style="height:38px" onclick="removeBkRow(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>`;
             cont.appendChild(row);
             updateBkRemoveButtons();
         }

@@ -16,8 +16,8 @@
             <tr>
                 <th>Status</th>
                 <td>{!! $room->is_active
-                    ? '<span class="badge bg-success">Aktif</span>'
-                    : '<span class="badge bg-danger">Nonaktif</span>' !!}</td>
+        ? '<span class="badge bg-success">Aktif</span>'
+        : '<span class="badge bg-danger">Nonaktif</span>' !!}</td>
             </tr>
             <tr>
                 <th>Deskripsi</th>

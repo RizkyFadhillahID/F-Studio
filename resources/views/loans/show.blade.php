@@ -145,9 +145,8 @@
                             <strong>{{ $item->equipment->name }}</strong>
                             <span class="badge bg-secondary ms-1">{{ $item->quantity }} unit</span>
                         </span>
-                        <input type="text" name="items[{{ $i }}][notes]"
-                            class="form-control form-control-sm ms-3" style="max-width:200px"
-                            placeholder="Catatan (opsional)">
+                        <input type="text" name="items[{{ $i }}][notes]" class="form-control form-control-sm ms-3"
+                            style="max-width:200px" placeholder="Catatan (opsional)">
                     </div>
                 @endforeach
                 <div class="mb-3 mt-2">

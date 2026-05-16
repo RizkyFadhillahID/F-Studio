@@ -86,7 +86,8 @@
                             <div class="fw-semibold small">{{ $l->loan_code }}</div>
                             <div class="text-muted" style="font-size:.75rem">{{ $l->user->name }}</div>
                             <div class="text-danger" style="font-size:.75rem">Jatuh tempo:
-                                {{ \App\Helpers\DateHelper::formatDateID($l->due_date) }}</div>
+                                {{ \App\Helpers\DateHelper::formatDateID($l->due_date) }}
+                            </div>
                         </div>
                         <a href="{{ route('loans.show', $l) }}" class="btn btn-sm btn-outline-danger">Detail</a>
                     </div>
@@ -103,11 +104,11 @@
         // Auto-polling setiap 30 detik untuk update angka pendingbooking & loan
         function pollAdminStats() {
             fetch('{{ route('dashboard.stats') }}', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then(r => r.ok ? r.json() : null)
                 .then(data => {
                     if (!data) return;
@@ -124,7 +125,7 @@
                         }
                     });
                 })
-                .catch(() => {});
+                .catch(() => { });
         }
         setInterval(pollAdminStats, 30000);
     </script>
