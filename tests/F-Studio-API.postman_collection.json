@@ -46,7 +46,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@fstudio.com\",\n    \"password\": \"password\",\n    \"device_name\": \"Postman\"\n}"
+							"raw": "{\n    \"email\": \"admin@fstudio.id\",\n    \"password\": \"password123\",\n    \"device_name\": \"Postman\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/login",
