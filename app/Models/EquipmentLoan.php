@@ -18,6 +18,10 @@ class EquipmentLoan extends Model
         'customer_phone',
         'purpose',
         'status',
+        'payment_status',
+        'payment_method',
+        'amount',
+        'paid_at',
         'notes',
         'admin_notes',
         'approved_by',
@@ -32,6 +36,8 @@ class EquipmentLoan extends Model
             'approved_at' => 'datetime',
             'returned_at' => 'datetime',
             'due_date' => 'date',
+            'paid_at' => 'datetime',
+            'amount' => 'decimal:2',
         ];
     }
 

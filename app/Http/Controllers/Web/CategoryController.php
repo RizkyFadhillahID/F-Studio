@@ -5,22 +5,22 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
     {
         $categories = Category::withCount('equipment')
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%"))
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%"))
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('categories.index', compact('categories'));
-    }
-
-    public function create()
-    {
-        return view('categories.create');
+        return Inertia::render('Categories/Index', [
+            'categories' => $categories,
+            'filters'    => ['search' => $request->search],
+        ]);
     }
 
     public function store(Request $request)
@@ -33,11 +33,6 @@ class CategoryController extends Controller
         Category::create($request->only('name', 'description'));
 
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan.');
-    }
-
-    public function edit(Category $category)
-    {
-        return view('categories.edit', compact('category'));
     }
 
     public function update(Request $request, Category $category)
@@ -55,7 +50,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if ($category->equipment()->exists()) {
-            return back()->withErrors(['error' => 'Kategori tidak dapat dihapus karena masih memiliki peralatan.']);
+            return back()->with('error', 'Kategori tidak dapat dihapus karena masih memiliki peralatan.');
         }
 
         $category->delete();

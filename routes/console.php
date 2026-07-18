@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schedule;
 
 // Mark loans as overdue every day at midnight
 Schedule::call(function () {
-    $count = EquipmentLoan::where('status', 'active')
+    $count = EquipmentLoan::whereIn('status', ['approved', 'active'])
         ->where('due_date', '<', now()->toDateString())
         ->update(['status' => 'overdue']);
 

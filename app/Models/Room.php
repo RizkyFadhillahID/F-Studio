@@ -14,8 +14,10 @@ class Room extends Model
         'code',
         'description',
         'capacity',
+        'price_per_hour',
         'facilities',
         'image',
+        'images',
         'is_active',
     ];
 
@@ -23,8 +25,10 @@ class Room extends Model
     {
         return [
             'facilities' => 'array',
+            'images' => 'array',
             'is_active' => 'boolean',
             'capacity' => 'integer',
+            'price_per_hour' => 'decimal:2',
         ];
     }
 

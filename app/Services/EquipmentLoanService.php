@@ -38,6 +38,19 @@ class EquipmentLoanService
                 }
             }
 
+            // Auto-approved layaknya booking ruangan: kurangi stok langsung saat
+            // dibuat, tidak menunggu langkah persetujuan admin terpisah.
+            foreach ($data['items'] as $item) {
+                $equipment = Equipment::lockForUpdate()->find($item['equipment_id']);
+                if ($equipment->quantity_available < $item['quantity']) {
+                    throw new \Exception(
+                        "Stok '{$equipment->name}' sudah tidak mencukupi saat diproses.",
+                        422
+                    );
+                }
+                $equipment->decrement('quantity_available', $item['quantity']);
+            }
+
             $loan = EquipmentLoan::create([
                 'user_id'        => $userId,
                 'booking_id'     => $data['booking_id'] ?? null,
@@ -46,13 +59,13 @@ class EquipmentLoanService
                 'customer_name'  => $data['customer_name'] ?? null,
                 'customer_phone' => $data['customer_phone'] ?? null,
                 'purpose'        => $data['purpose'],
-                'status'         => 'pending',
+                'status'         => 'approved',
+                'approved_at'    => now(),
                 'notes'          => $data['notes'] ?? null,
                 'due_date'       => $dueDate,
             ]);
 
             foreach ($data['items'] as $item) {
-                $equipment = Equipment::find($item['equipment_id']);
                 EquipmentLoanItem::create([
                     'equipment_loan_id' => $loan->id,
                     'equipment_id'      => $item['equipment_id'],
@@ -63,9 +76,9 @@ class EquipmentLoanService
 
             AppNotification::create([
                 'user_id' => $userId,
-                'type'    => 'loan_created',
-                'title'   => 'Peminjaman Diajukan',
-                'message' => "Peminjaman peralatan dengan kode {$loan->loan_code} berhasil diajukan.",
+                'type'    => 'loan_approved',
+                'title'   => 'Peminjaman Disetujui',
+                'message' => "Peminjaman peralatan {$loan->loan_code} disetujui secara otomatis. Silakan lakukan pembayaran.",
                 'data'    => ['loan_id' => $loan->id],
             ]);
 
@@ -139,7 +152,7 @@ class EquipmentLoanService
 
     public function markOverdue(): int
     {
-        return EquipmentLoan::where('status', 'active')
+        return EquipmentLoan::whereIn('status', ['approved', 'active'])
             ->where('due_date', '<', now()->toDateString())
             ->update(['status' => 'overdue']);
     }
@@ -150,7 +163,7 @@ class EquipmentLoanService
      */
     public function updateStatus(EquipmentLoan $loan, string $newStatus, int $adminId, ?string $adminNotes): EquipmentLoan
     {
-        $allowed = ['pending', 'approved', 'rejected', 'cancelled'];
+        $allowed = ['pending', 'approved', 'rejected', 'cancelled', 'returned'];
         if (!in_array($newStatus, $allowed)) {
             throw new \Exception('Status tidak valid.', 422);
         }
@@ -166,7 +179,8 @@ class EquipmentLoanService
 
             $stockDeducted = in_array($oldStatus, ['approved', 'active', 'overdue']);
             $needsDeduct   = $newStatus === 'approved';
-            $needsRestore  = $stockDeducted && in_array($newStatus, ['pending', 'rejected', 'cancelled']);
+            // 'returned' juga mengembalikan stok (peminjaman selesai).
+            $needsRestore  = $stockDeducted && in_array($newStatus, ['pending', 'rejected', 'cancelled', 'returned']);
 
             if ($needsRestore) {
                 foreach ($loan->items as $item) {
@@ -178,9 +192,13 @@ class EquipmentLoanService
             if ($needsDeduct && !$stockDeducted) {
                 foreach ($loan->items as $item) {
                     $eq = Equipment::lockForUpdate()->find($item->equipment_id);
-                    if ($eq && $eq->quantity_available >= $item->quantity) {
-                        $eq->decrement('quantity_available', $item->quantity);
+                    if (! $eq || $eq->quantity_available < $item->quantity) {
+                        throw new \Exception(
+                            "Stok '{$item->equipment?->name}' tidak mencukupi untuk menyetujui peminjaman ini.",
+                            422
+                        );
                     }
+                    $eq->decrement('quantity_available', $item->quantity);
                 }
             }
 
@@ -188,6 +206,7 @@ class EquipmentLoanService
                 'status'      => $newStatus,
                 'approved_by' => $adminId,
                 'approved_at' => $newStatus === 'approved' ? now() : $loan->approved_at,
+                'returned_at' => $newStatus === 'returned' ? now() : $loan->returned_at,
                 'admin_notes' => $adminNotes,
             ]);
 
@@ -223,7 +242,14 @@ class EquipmentLoanService
         return DB::transaction(function () use ($loan, $returnData, $userId) {
             $itemsById = $loan->items->keyBy('id');
 
-            foreach ($returnData['items'] ?? [] as $itemReturn) {
+            // Jika tidak ada daftar item eksplisit (tombol "Kembalikan" cepat
+            // di admin/resepsionis tidak mengumpulkan kondisi per-item),
+            // anggap SEMUA item pada peminjaman ini dikembalikan.
+            $itemsToReturn = !empty($returnData['items'])
+                ? $returnData['items']
+                : $itemsById->map(fn ($item) => ['id' => $item->id])->values()->all();
+
+            foreach ($itemsToReturn as $itemReturn) {
                 $item = $itemsById->get($itemReturn['id']);
                 if (!$item) {
                     continue;

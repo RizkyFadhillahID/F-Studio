@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             EquipmentSeeder::class,
             RoomSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

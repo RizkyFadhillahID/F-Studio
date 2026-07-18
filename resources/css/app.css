@@ -9,3 +9,118 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/**
+ * ── Aurora design system ──
+ * Tema gelap + kaca (glass) dipakai di seluruh dashboard (admin, resepsionis,
+ * member) agar satu dunia visual dengan landing page & halaman login.
+ */
+@layer components {
+    /* Latar halaman: gelap dengan glow ambient di sudut */
+    .aurora-page {
+        background-color: #0a0b12;
+        position: relative;
+        isolation: isolate;
+        min-height: 100vh;
+    }
+    .aurora-page::before,
+    .aurora-page::after {
+        content: '';
+        position: fixed;
+        border-radius: 9999px;
+        filter: blur(90px);
+        z-index: -1;
+        pointer-events: none;
+    }
+    .aurora-page::before {
+        width: 32rem;
+        height: 24rem;
+        left: 8%;
+        top: -10rem;
+        background: rgba(99, 102, 241, 0.16);
+    }
+    .aurora-page::after {
+        width: 28rem;
+        height: 22rem;
+        right: -6rem;
+        bottom: -8rem;
+        background: rgba(34, 211, 238, 0.08);
+    }
+
+    /* Panel kaca umum (kartu, tabel wrapper, modal) */
+    .aurora-card {
+        background-color: rgb(255 255 255 / 0.045);
+        border: 1px solid rgb(255 255 255 / 0.09);
+        border-radius: 1rem;
+        backdrop-filter: blur(12px);
+    }
+    .aurora-card-solid {
+        background-color: #12141f;
+        border: 1px solid rgb(255 255 255 / 0.08);
+        border-radius: 1rem;
+    }
+
+    /* Input/select/textarea */
+    .aurora-input {
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid rgb(255 255 255 / 0.12);
+        background-color: rgb(255 255 255 / 0.05);
+        padding: 0.55rem 0.85rem;
+        font-size: 0.875rem;
+        color: #e9eaf0;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .aurora-input::placeholder { color: #6b7094; }
+    .aurora-input:focus {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 0.25);
+    }
+    select.aurora-input option {
+        background-color: #12141f;
+        color: #e9eaf0;
+    }
+
+
+    /* Tabel */
+    .aurora-th {
+        text-align: left;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #7d84a8;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+    }
+    .aurora-td {
+        padding: 0.75rem 1rem;
+        border-top: 1px solid rgb(255 255 255 / 0.06);
+        color: #d3d5e8;
+    }
+    .aurora-row:hover { background-color: rgb(255 255 255 / 0.035); }
+
+    /* Tombol */
+    .aurora-btn-primary {
+        background-color: #4f46e5;
+        color: #fff;
+        box-shadow: 0 8px 20px -6px rgb(79 70 229 / 0.5);
+        transition: background-color 0.15s;
+    }
+    .aurora-btn-primary:hover { background-color: #4338ca; }
+    .aurora-btn-ghost {
+        border: 1px solid rgb(255 255 255 / 0.12);
+        background-color: rgb(255 255 255 / 0.04);
+        color: #d3d5e8;
+        transition: background-color 0.15s;
+    }
+    .aurora-btn-ghost:hover { background-color: rgb(255 255 255 / 0.09); }
+
+    /* Badge status (semantik, terpisah dari accent) */
+    .aurora-pill { display: inline-block; white-space: nowrap; border-radius: 9999px; padding: 0.15rem 0.6rem; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+    .aurora-pill-ok { color: #4ade80; background-color: rgb(74 222 128 / 0.1); border-color: rgb(74 222 128 / 0.3); }
+    .aurora-pill-warn { color: #fbbf24; background-color: rgb(251 191 36 / 0.1); border-color: rgb(251 191 36 / 0.3); }
+    .aurora-pill-danger { color: #f87171; background-color: rgb(248 113 113 / 0.1); border-color: rgb(248 113 113 / 0.3); }
+    .aurora-pill-info { color: #7dd3fc; background-color: rgb(125 211 252 / 0.1); border-color: rgb(125 211 252 / 0.3); }
+    .aurora-pill-muted { color: #9aa0c0; background-color: rgb(255 255 255 / 0.06); border-color: rgb(255 255 255 / 0.1); }
+}

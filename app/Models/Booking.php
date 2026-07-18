@@ -19,6 +19,10 @@ class Booking extends Model
         'start_datetime',
         'end_datetime',
         'status',
+        'payment_status',
+        'payment_method',
+        'amount',
+        'paid_at',
         'notes',
         'admin_notes',
         'approved_by',
@@ -31,6 +35,8 @@ class Booking extends Model
             'start_datetime' => 'datetime',
             'end_datetime' => 'datetime',
             'approved_at' => 'datetime',
+            'paid_at' => 'datetime',
+            'amount' => 'decimal:2',
         ];
     }
 

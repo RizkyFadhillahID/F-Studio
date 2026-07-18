@@ -34,14 +34,15 @@ class BookingService
                 'start_datetime' => $data['start_datetime'],
                 'end_datetime'   => $data['end_datetime'],
                 'notes'          => $data['notes'] ?? null,
-                'status'         => 'pending',
+                'status'         => 'approved',
+                'approved_at'    => now(),
             ]);
 
             $this->createNotification(
                 $userId,
-                'booking_created',
-                'Pemesanan Diajukan',
-                "Pemesanan ruang {$room->name} dengan kode {$booking->booking_code} berhasil diajukan.",
+                'booking_approved',
+                'Pemesanan Disetujui',
+                "Pemesanan ruang {$room->name} dengan kode {$booking->booking_code} disetujui secara otomatis. Silakan lakukan pembayaran.",
                 ['booking_id' => $booking->id]
             );
 
@@ -72,9 +73,13 @@ class BookingService
             foreach ($linkedLoans as $loan) {
                 foreach ($loan->items as $item) {
                     $equipment = Equipment::lockForUpdate()->find($item->equipment_id);
-                    if ($equipment && $equipment->quantity_available >= $item->quantity) {
-                        $equipment->decrement('quantity_available', $item->quantity);
+                    if (! $equipment || $equipment->quantity_available < $item->quantity) {
+                        throw new \Exception(
+                            "Stok '{$item->equipment?->name}' tidak mencukupi untuk peminjaman terkait booking ini.",
+                            422
+                        );
                     }
+                    $equipment->decrement('quantity_available', $item->quantity);
                 }
                 $loan->update([
                     'status'      => 'approved',
@@ -153,7 +158,7 @@ class BookingService
      */
     public function updateStatus(Booking $booking, string $newStatus, int $adminId, ?string $adminNotes): Booking
     {
-        $allowed = ['pending', 'approved', 'rejected', 'cancelled'];
+        $allowed = ['pending', 'approved', 'rejected', 'cancelled', 'completed'];
         if (!in_array($newStatus, $allowed)) {
             throw new \Exception('Status tidak valid.', 422);
         }
@@ -169,14 +174,25 @@ class BookingService
                 ->with('items.equipment')
                 ->get();
 
-            // approved → pending/rejected/cancelled: kembalikan stok peralatan
-            if ($oldStatus === 'approved' && in_array($newStatus, ['pending', 'rejected', 'cancelled'])) {
+            // approved → pending/rejected/cancelled/completed: kembalikan stok peralatan.
+            // Untuk 'completed' peminjaman ditandai 'returned'; selain itu mengikuti
+            // status booking (pending kembali ke pending, sisanya rejected/cancelled).
+            if ($oldStatus === 'approved' && in_array($newStatus, ['pending', 'rejected', 'cancelled', 'completed'])) {
+                $loanStatus = match ($newStatus) {
+                    'pending'   => 'pending',
+                    'completed' => 'returned',
+                    default     => $newStatus,
+                };
+
                 foreach ($linkedLoans->where('status', 'approved') as $loan) {
                     foreach ($loan->items as $item) {
                         Equipment::lockForUpdate()->find($item->equipment_id)
                             ?->increment('quantity_available', $item->quantity);
                     }
-                    $loan->update(['status' => $newStatus === 'pending' ? 'pending' : $newStatus]);
+                    $loan->update([
+                        'status'      => $loanStatus,
+                        'returned_at' => $newStatus === 'completed' ? now() : $loan->returned_at,
+                    ]);
                 }
             }
 
@@ -185,9 +201,13 @@ class BookingService
                 foreach ($linkedLoans->where('status', 'pending') as $loan) {
                     foreach ($loan->items as $item) {
                         $eq = Equipment::lockForUpdate()->find($item->equipment_id);
-                        if ($eq && $eq->quantity_available >= $item->quantity) {
-                            $eq->decrement('quantity_available', $item->quantity);
+                        if (! $eq || $eq->quantity_available < $item->quantity) {
+                            throw new \Exception(
+                                "Stok '{$item->equipment?->name}' tidak mencukupi untuk peminjaman terkait booking ini.",
+                                422
+                            );
                         }
+                        $eq->decrement('quantity_available', $item->quantity);
                     }
                     $loan->update([
                         'status'      => 'approved',
@@ -204,9 +224,13 @@ class BookingService
                 foreach ($linkedLoans->where('status', $oldStatus) as $loan) {
                     foreach ($loan->items as $item) {
                         $eq = Equipment::lockForUpdate()->find($item->equipment_id);
-                        if ($eq && $eq->quantity_available >= $item->quantity) {
-                            $eq->decrement('quantity_available', $item->quantity);
+                        if (! $eq || $eq->quantity_available < $item->quantity) {
+                            throw new \Exception(
+                                "Stok '{$item->equipment?->name}' tidak mencukupi untuk peminjaman terkait booking ini.",
+                                422
+                            );
                         }
+                        $eq->decrement('quantity_available', $item->quantity);
                     }
                     $loan->update([
                         'status'      => 'approved',

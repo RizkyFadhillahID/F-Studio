@@ -9,6 +9,7 @@ use App\Models\EquipmentLoan;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -24,7 +25,19 @@ class DashboardController extends Controller
             'pending_loans'    => EquipmentLoan::where('status', 'pending')->count(),
             'pending_bookings' => Booking::where('status', 'pending')->count(),
             'total_members'    => User::where('role', 'member')->where('is_active', true)->count(),
+            'unpaid_bookings'  => Booking::where('payment_status', 'unpaid')->count(),
+            'unpaid_loans'     => EquipmentLoan::where('payment_status', 'unpaid')->count(),
         ];
+
+        $recentBookingPayments = Booking::with(['user', 'room'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $recentLoanPayments = EquipmentLoan::with(['user'])
+            ->latest()
+            ->take(6)
+            ->get();
 
         $pendingLoans    = EquipmentLoan::with(['user', 'items.equipment'])
             ->where('status', 'pending')
@@ -49,12 +62,14 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        return view('dashboard', compact(
+        return Inertia::render('Dashboard', compact(
             'stats',
             'pendingLoans',
             'pendingBookings',
             'overdueLoans',
-            'recentCheckIns'
+            'recentCheckIns',
+            'recentBookingPayments',
+            'recentLoanPayments'
         ));
     }
 

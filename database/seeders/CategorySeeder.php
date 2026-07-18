@@ -16,6 +16,7 @@ class CategorySeeder extends Seeder
             ['name' => 'Tripod & Stabilizer', 'description' => 'Tripod, monopod, gimbal, dan alat stabilisasi.'],
             ['name' => 'Lensa', 'description' => 'Lensa berbagai jenis untuk kamera mirrorless dan DSLR.'],
             ['name' => 'Aksesori Studio', 'description' => 'Backdrop, stand, clamp, dan perlengkapan studio lainnya.'],
+            ['name' => 'Drone & Aerial', 'description' => 'Drone, kamera udara, dan aksesori penerbangan.'],
         ];
 
         foreach ($categories as $category) {

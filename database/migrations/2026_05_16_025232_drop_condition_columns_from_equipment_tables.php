@@ -12,6 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
+            // Index [condition, is_active] harus dilepas dulu sebelum kolomnya
+            // dihapus (SQLite menolak drop kolom yang masih diindeks).
+            $table->dropIndex(['condition', 'is_active']);
             $table->dropColumn('condition');
         });
 
