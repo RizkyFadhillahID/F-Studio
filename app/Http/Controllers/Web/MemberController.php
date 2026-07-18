@@ -98,14 +98,23 @@ class MemberController extends Controller
     {
         $bookings = Booking::where('user_id', Auth::id())
             ->with('room')
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when($request->booking_status, fn ($q) => $q->where('status', $request->booking_status))
             ->latest()
-            ->paginate(10)
+            ->paginate(10, ['*'], 'bookings_page')
+            ->withQueryString();
+
+        $loans = EquipmentLoan::where('user_id', Auth::id())
+            ->with('items.equipment')
+            ->when($request->loan_status, fn ($q) => $q->where('status', $request->loan_status))
+            ->latest()
+            ->paginate(10, ['*'], 'loans_page')
             ->withQueryString();
 
         return Inertia::render('Member/Bookings', [
-            'bookings' => $bookings,
-            'filters'  => ['status' => $request->status],
+            'bookings'  => $bookings,
+            'loans'     => $loans,
+            'filters'   => ['booking_status' => $request->booking_status, 'loan_status' => $request->loan_status],
+            'activeTab' => $request->tab === 'loans' ? 'loans' : 'bookings',
         ]);
     }
 
@@ -147,26 +156,11 @@ class MemberController extends Controller
         try {
             $loan = $this->loanService->create($data, Auth::id());
 
-            return redirect()->route('member.loans')
+            return redirect()->route('member.bookings', ['tab' => 'loans'])
                 ->with('success', "Peminjaman {$loan->loan_code} berhasil dibuat! Silakan lakukan pembayaran.");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
-    }
-
-    public function loans(Request $request)
-    {
-        $loans = EquipmentLoan::where('user_id', Auth::id())
-            ->with('items.equipment')
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return Inertia::render('Member/Loans', [
-            'loans'   => $loans,
-            'filters' => ['status' => $request->status],
-        ]);
     }
 
     // ── Pembayaran simulasi ───────────────────────────────────────────────────

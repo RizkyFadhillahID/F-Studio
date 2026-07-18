@@ -110,10 +110,9 @@ Route::middleware(['auth', 'account.active'])->group(function () {
         Route::get('/rooms', [\App\Http\Controllers\Web\MemberController::class, 'rooms'])->name('rooms');
         Route::post('/bookings', [\App\Http\Controllers\Web\MemberController::class, 'storeBooking'])->name('bookings.store');
         Route::get('/bookings', [\App\Http\Controllers\Web\MemberController::class, 'bookings'])->name('bookings');
-        // Peminjaman alat self-service
+        // Peminjaman alat self-service (daftar peminjaman digabung ke halaman Transaksi / 'bookings')
         Route::get('/equipment', [\App\Http\Controllers\Web\MemberController::class, 'equipment'])->name('equipment');
         Route::post('/loans', [\App\Http\Controllers\Web\MemberController::class, 'storeLoan'])->name('loans.store');
-        Route::get('/loans', [\App\Http\Controllers\Web\MemberController::class, 'loans'])->name('loans');
         // Pembayaran simulasi
         Route::post('/bookings/{booking}/pay', [\App\Http\Controllers\Web\MemberController::class, 'payBooking'])->name('bookings.pay');
         Route::post('/bookings/{booking}/cancel', [\App\Http\Controllers\Web\MemberController::class, 'cancelBooking'])->name('bookings.cancel');

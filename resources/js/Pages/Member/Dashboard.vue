@@ -121,7 +121,7 @@ const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('id-ID', { dateStyle:
             <div class="aurora-card p-5">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-sm font-bold text-white">Peminjaman Terbaru</h2>
-                    <Link href="/member/loans" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300">Semua pinjaman</Link>
+                    <Link href="/member/bookings?tab=loans" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300">Semua pinjaman</Link>
                 </div>
                 <ul v-if="myLoans.length" class="divide-y divide-white/[0.06]">
                     <li v-for="l in myLoans" :key="l.id" class="flex items-center gap-3 py-2.5">

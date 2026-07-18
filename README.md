@@ -191,8 +191,8 @@ Rumus ini didefinisikan di **dua tempat yang harus tetap sinkron**: `App\Service
 
 Tombol "Bayar" memakai `PaymentService` yang **identik** di dua portal:
 
-- **Member**   membayar pemesanan/peminjaman miliknya sendiri, dari halaman "Pemesanan Saya" / "Peminjaman Saya".
-- **Resepsionis**   membayar atas nama pelanggan walk-in, dari halaman "Transaksi" (tab Pemesanan Ruangan / Peminjaman Alat).
+- **Member** — membayar pemesanan/peminjaman miliknya sendiri, dari halaman "Transaksi" (tab Pemesanan Ruangan / Peminjaman Alat).
+- **Resepsionis** — membayar atas nama pelanggan walk-in, dari halaman "Transaksi" (tab Pemesanan Ruangan / Peminjaman Alat).
 
 Admin **tidak** punya tombol bayar   perannya hanya memantau status pembayaran semua transaksi lewat dashboard dan menu Transaksi (lihat 3.5).
 
@@ -211,13 +211,11 @@ flowchart TD
         R3["Transaksi: riwayat + pembayaran (atas nama pelanggan)"]
     end
     subgraph Member["Portal Member"]
-        M1[Katalog Ruangan & Peralatan]
-        M2["Pemesanan Saya + Bayar"]
-        M3["Peminjaman Saya + Bayar"]
+        M1["Katalog Ruangan & Peralatan (+ halaman detail per item)"]
+        M2["Transaksi: tab Pemesanan Ruangan & Peminjaman Alat + Bayar"]
     end
     A2 -.mengelola.-> R3
     A2 -.mengelola.-> M2
-    A2 -.mengelola.-> M3
 ```
 
 ---

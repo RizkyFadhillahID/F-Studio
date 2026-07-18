@@ -15,18 +15,29 @@ const today = new Date().toISOString().slice(0, 10);
 
 // ── Keranjang pinjaman ────────────────────────────────────────────────
 const cart = ref([]); // [{equipment, quantity}]
-const viewState = ref('index'); // 'index' | 'checkout'
+const viewState = ref('index'); // 'index' | 'detail' | 'checkout'
+
+// ── Detail peralatan ────────────────────────────────────────────────
+const detailItem = ref(null);
+
+function openDetail(item) {
+    detailItem.value = item;
+    viewState.value = 'detail';
+}
 
 function inCart(item) {
     return cart.value.some((c) => c.equipment.id === item.id);
 }
-function addToCart(item) {
-    if (!inCart(item) && item.quantity_available > 0) {
-        cart.value.push({ equipment: item, quantity: 1 });
-    }
-}
 function removeFromCart(id) {
     cart.value = cart.value.filter((c) => c.equipment.id !== id);
+}
+/** Klik pertama menambah ke keranjang, klik lagi membatalkan pilihan. */
+function toggleCart(item) {
+    if (inCart(item)) {
+        removeFromCart(item.id);
+    } else if (item.quantity_available > 0) {
+        cart.value.push({ equipment: item, quantity: 1 });
+    }
 }
 const cartCount = computed(() => cart.value.reduce((s, c) => s + Number(c.quantity || 0), 0));
 
@@ -93,15 +104,15 @@ function applyFilter(categoryId) {
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <div v-for="item in equipment" :key="item.id" class="group flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] transition hover:border-indigo-500/30">
-                    <div class="relative h-36 w-full shrink-0 overflow-hidden bg-white/5">
+                    <button class="relative block h-36 w-full shrink-0 cursor-pointer overflow-hidden bg-white/5" @click="openDetail(item)">
                         <img v-if="item.image" :src="`/${item.image}`" :alt="item.name" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" />
                         <div v-else class="flex h-full items-center justify-center text-slate-600">
                             <svg class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21m0-12h.008v.008H9V9zm0 6h.008v.008H9V15zm0-3h.008v.008H9v-.008zm3-3h.008v.008H12V9zm0 6h.008v.008H12V15zm0-3h.008v.008H12v-.008zm3-3h.008v.008H15V9zm0 6h.008v.008H15V15zm0-3h.008v.008H15v-.008zm3-3h.008v.008H18V9zm0 6h.008v.008H18V15zm0-3h.008v.008H18v-.008zM10.5 4.5h3A1.5 1.5 0 0115 6v3h-6V6a1.5 1.5 0 011.5-1.5z" /></svg>
                         </div>
                         <span class="absolute left-2.5 top-2.5 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-indigo-300 backdrop-blur">{{ item.category?.name }}</span>
-                    </div>
+                    </button>
                     <div class="flex flex-1 flex-col p-4">
-                        <h3 class="font-medium text-white line-clamp-1">{{ item.name }}</h3>
+                        <button class="text-left font-medium text-white line-clamp-1 hover:text-indigo-300 hover:underline" @click="openDetail(item)">{{ item.name }}</button>
                         <p class="mt-1 text-xs text-slate-500 font-mono">Kode: {{ item.code }}</p>
                         <p class="mt-1 text-sm font-medium text-indigo-300">{{ formatRupiah(item.price_per_day) }}<span class="text-xs text-slate-500">/hari</span></p>
                         <div class="mt-auto pt-3 flex items-center justify-between gap-2">
@@ -112,10 +123,10 @@ function applyFilter(categoryId) {
                             <button
                                 v-if="item.quantity_available > 0"
                                 class="rounded-lg px-2.5 py-1.5 text-xs font-semibold transition"
-                                :class="inCart(item) ? 'bg-indigo-500/20 text-indigo-300 pointer-events-none' : 'aurora-btn-primary'"
-                                @click="addToCart(item)"
+                                :class="inCart(item) ? 'border border-indigo-500/40 bg-indigo-500/20 text-indigo-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-300' : 'aurora-btn-primary'"
+                                @click="toggleCart(item)"
                             >
-                                {{ inCart(item) ? 'Dipilih' : '+ Pilih' }}
+                                {{ inCart(item) ? '✕ Batalkan' : '+ Pilih' }}
                             </button>
                             <span v-else class="text-xs font-semibold text-red-400">Habis</span>
                         </div>
@@ -138,6 +149,56 @@ function applyFilter(categoryId) {
                     </div>
                 </div>
             </Transition>
+        </div>
+
+        <!-- Detail peralatan -->
+        <div v-else-if="viewState === 'detail'" class="space-y-6">
+            <h2 class="text-lg font-semibold text-white mb-2">{{ detailItem?.name ?? 'Detail Peralatan' }}</h2>
+            <div v-if="detailItem" class="space-y-4">
+                <div class="overflow-hidden rounded-xl bg-slate-950/40 h-64 w-full flex items-center justify-center p-2">
+                    <img v-if="detailItem.image" :src="`/${detailItem.image}`" :alt="detailItem.name" class="max-h-full max-w-full object-contain rounded-lg" />
+                    <svg v-else class="h-16 w-16 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21m0-12h.008v.008H9V9zm0 6h.008v.008H9V15zm0-3h.008v.008H9v-.008zm3-3h.008v.008H12V9zm0 6h.008v.008H12V15zm0-3h.008v.008H12v-.008zm3-3h.008v.008H15V9zm0 6h.008v.008H15V15zm0-3h.008v.008H15v-.008zm3-3h.008v.008H18V9zm0 6h.008v.008H18V15zm0-3h.008v.008H18v-.008zM10.5 4.5h3A1.5 1.5 0 0115 6v3h-6V6a1.5 1.5 0 011.5-1.5z" /></svg>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-lg bg-white/5 p-3">
+                        <p class="text-xs text-slate-500">Kode</p>
+                        <p class="font-medium text-white">{{ detailItem.code }}</p>
+                    </div>
+                    <div class="rounded-lg bg-white/5 p-3">
+                        <p class="text-xs text-slate-500">Kategori</p>
+                        <p class="font-medium text-white">{{ detailItem.category?.name ?? '—' }}</p>
+                    </div>
+                    <div class="rounded-lg bg-white/5 p-3">
+                        <p class="text-xs text-slate-500">Harga</p>
+                        <p class="font-medium text-white">{{ formatRupiah(detailItem.price_per_day) }}/hari</p>
+                    </div>
+                    <div class="rounded-lg bg-white/5 p-3">
+                        <p class="text-xs text-slate-500">Ketersediaan</p>
+                        <p class="font-medium" :class="detailItem.quantity_available > 0 ? 'text-emerald-400' : 'text-red-400'">
+                            {{ detailItem.quantity_available }} dari {{ detailItem.quantity_total }} unit
+                        </p>
+                    </div>
+                </div>
+
+                <div v-if="detailItem.description">
+                    <p class="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">Deskripsi</p>
+                    <p class="text-sm leading-relaxed text-slate-400">{{ detailItem.description }}</p>
+                </div>
+
+                <div class="flex justify-end gap-2 border-t border-white/[0.07] pt-4">
+                    <button class="aurora-btn-ghost rounded-lg px-4 py-2 text-sm" @click="viewState = 'index'">Kembali</button>
+                    <button
+                        v-if="detailItem.quantity_available > 0"
+                        class="rounded-lg px-4 py-2 text-sm font-semibold transition"
+                        :class="inCart(detailItem) ? 'border border-indigo-500/40 bg-indigo-500/20 text-indigo-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-300' : 'aurora-btn-primary'"
+                        @click="toggleCart(detailItem)"
+                    >
+                        {{ inCart(detailItem) ? '✕ Batalkan Pilihan' : '+ Pilih Alat Ini' }}
+                    </button>
+                    <span v-else class="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-400">Stok Habis</span>
+                </div>
+            </div>
         </div>
 
         <!-- Checkout page view -->
