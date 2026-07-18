@@ -77,26 +77,29 @@ const galleryOf = (room) => {
 };
 
 const form = useForm({
-    name: '', code: '', capacity: 1, price_per_hour: 50000, facilities: '', description: '', images: null, is_active: true,
+    name: '', code: '', capacity: 1, price_per_hour: 50000, facilities: '', description: '', images: null, existing_images: [], is_active: true,
 });
-const fileRows = ref([]); // [{ file, preview }] — foto baru, satu baris per foto (pola "+ Tambah item")
-const originalGallery = ref([]); // galeri asli (mode edit), ditampilkan selama belum ada baris foto baru
+// Satu baris per foto (pola "+ Tambah item"), bisa berupa foto lama yang sudah
+// tersimpan ({ type: 'existing', path }) atau foto baru yang belum diunggah
+// ({ type: 'new', file, preview }) — masing-masing bisa dihapus satu per satu.
+const photoRows = ref([]);
 
-function addFileRow() {
-    fileRows.value.push({ file: null, preview: null });
+function addPhotoRow() {
+    photoRows.value.push({ type: 'new', file: null, preview: null });
 }
-function removeFileRow(idx) {
-    fileRows.value.splice(idx, 1);
+function removePhotoRow(idx) {
+    photoRows.value.splice(idx, 1);
     syncImages();
 }
 function onRowFileChange(idx, e) {
     const file = e.target.files[0] ?? null;
-    fileRows.value[idx] = { file, preview: file ? URL.createObjectURL(file) : null };
+    photoRows.value[idx] = { type: 'new', file, preview: file ? URL.createObjectURL(file) : null };
     syncImages();
 }
 function syncImages() {
-    const files = fileRows.value.map((r) => r.file).filter(Boolean);
+    const files = photoRows.value.filter((r) => r.type === 'new' && r.file).map((r) => r.file);
     form.images = files.length ? files : null;
+    form.existing_images = photoRows.value.filter((r) => r.type === 'existing').map((r) => r.path);
 }
 
 function openCreate() {
@@ -104,8 +107,8 @@ function openCreate() {
     form.reset();
     form.clearErrors();
     form.images = null;
-    fileRows.value = [{ file: null, preview: null }];
-    originalGallery.value = [];
+    form.existing_images = [];
+    photoRows.value = [{ type: 'new', file: null, preview: null }];
     viewState.value = 'create';
 }
 
@@ -120,8 +123,9 @@ function openEdit(room) {
     form.description = room.description ?? '';
     form.is_active = !!room.is_active;
     form.images = null;
-    fileRows.value = [];
-    originalGallery.value = galleryOf(room).map((img) => `/${img}`);
+    const gallery = galleryOf(room);
+    form.existing_images = [...gallery];
+    photoRows.value = gallery.map((path) => ({ type: 'existing', path }));
     viewState.value = 'edit';
 }
 
@@ -324,37 +328,35 @@ function doSearch() {
                 <div>
                     <div class="mb-2 flex items-center justify-between">
                         <label class="text-sm font-medium text-slate-300">Foto Ruangan</label>
-                        <button type="button" class="text-xs font-medium text-indigo-400 hover:underline" @click="addFileRow">+ Tambah Foto</button>
+                        <button type="button" class="text-xs font-medium text-indigo-400 hover:underline" @click="addPhotoRow">+ Tambah Foto</button>
                     </div>
 
-                    <!-- Galeri saat ini (mode edit, selama belum ada baris foto baru) -->
-                    <template v-if="editing && !fileRows.length && originalGallery.length">
-                        <div class="mb-2 flex flex-wrap gap-2">
-                            <div v-for="(img, idx) in originalGallery" :key="idx" class="h-14 w-20 overflow-hidden rounded-lg border border-white/10 bg-white/5">
-                                <img :src="img" class="h-full w-full object-cover" />
-                            </div>
-                        </div>
-                        <p class="mb-3 text-xs text-slate-500">Foto saat ini. Klik "+ Tambah Foto" untuk menggantinya.</p>
-                    </template>
-
-                    <div v-for="(row, i) in fileRows" :key="i" class="mb-2 grid grid-cols-12 gap-2 items-center">
+                    <div v-for="(row, i) in photoRows" :key="i" class="mb-2 grid grid-cols-12 gap-2 items-center">
                         <div class="col-span-9 flex items-center gap-2">
-                            <div v-if="row.preview" class="h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5">
-                                <img :src="row.preview" class="h-full w-full object-cover" />
-                            </div>
-                            <input
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp"
-                                class="block w-full text-xs text-slate-400 file:mr-2 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-2.5 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-indigo-700"
-                                @change="onRowFileChange(i, $event)"
-                            />
+                            <template v-if="row.type === 'existing'">
+                                <div class="h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5">
+                                    <img :src="`/${row.path}`" class="h-full w-full object-cover" />
+                                </div>
+                                <span class="text-xs text-slate-500">Foto tersimpan</span>
+                            </template>
+                            <template v-else>
+                                <div v-if="row.preview" class="h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5">
+                                    <img :src="row.preview" class="h-full w-full object-cover" />
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    class="block w-full text-xs text-slate-400 file:mr-2 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-2.5 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-indigo-700"
+                                    @change="onRowFileChange(i, $event)"
+                                />
+                            </template>
                         </div>
-                        <button type="button" class="col-span-3 rounded-lg border border-white/10 bg-white/5 text-sm text-red-400 hover:bg-red-500/10" @click="removeFileRow(i)">Hapus</button>
+                        <button type="button" class="col-span-3 rounded-lg border border-white/10 bg-white/5 text-sm text-red-400 hover:bg-red-500/10" @click="removePhotoRow(i)">Hapus</button>
                     </div>
-                    <p v-if="!fileRows.length && !(editing && originalGallery.length)" class="text-xs text-slate-500">Belum ada foto dipilih. Klik "+ Tambah Foto" untuk menambah.</p>
+                    <p v-if="!photoRows.length" class="text-xs text-slate-500">Belum ada foto dipilih. Klik "+ Tambah Foto" untuk menambah.</p>
 
                     <p v-if="form.errors.images" class="mt-1 text-sm text-red-400">{{ form.errors.images }}</p>
-                    <p class="mt-1 text-xs text-slate-500">JPG/PNG/WebP, maks 2 MB per file.</p>
+                    <p class="mt-1 text-xs text-slate-500">JPG/PNG/WebP, maks 2 MB per file. Hapus baris untuk membuang foto tertentu tanpa memengaruhi foto lain.</p>
                 </div>
                 <label class="flex items-center gap-2 text-sm text-slate-400">
                     <input v-model="form.is_active" type="checkbox" class="rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500" /> Aktif

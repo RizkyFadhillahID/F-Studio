@@ -60,35 +60,47 @@ class RoomController extends Controller
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:100'],
-            'code'        => ['required', 'string', 'max:20', "unique:rooms,code,{$room->id}"],
-            'description'    => ['nullable', 'string'],
-            'capacity'       => ['required', 'integer', 'min:1'],
-            'price_per_hour' => ['required', 'numeric', 'min:0'],
-            'facilities'     => ['nullable', 'string'],
-            'images'         => ['nullable', 'array'],
-            'images.*'       => ['image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
-            'is_active'      => ['nullable', 'boolean'],
+            'name'              => ['required', 'string', 'max:100'],
+            'code'              => ['required', 'string', 'max:20', "unique:rooms,code,{$room->id}"],
+            'description'       => ['nullable', 'string'],
+            'capacity'          => ['required', 'integer', 'min:1'],
+            'price_per_hour'    => ['required', 'numeric', 'min:0'],
+            'facilities'        => ['nullable', 'string'],
+            'existing_images'   => ['nullable', 'array'],
+            'existing_images.*' => ['string'],
+            'images'            => ['nullable', 'array'],
+            'images.*'          => ['image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'is_active'         => ['nullable', 'boolean'],
         ]);
 
         $validated['facilities'] = $this->parseFacilities($validated['facilities'] ?? null);
         $validated['is_active'] = $request->boolean('is_active');
 
-        if ($request->hasFile('images')) {
-            $oldImages = is_array($room->images) ? $room->images : ($room->image ? [$room->image] : []);
-            foreach ($oldImages as $img) {
-                if ($img && str_starts_with($img, 'storage/rooms/')) {
-                    Storage::disk('public')->delete(str_replace('storage/', '', $img));
-                }
-            }
+        // Foto lama yang dipertahankan (hasil pilihan pengguna, divalidasi ulang
+        // terhadap galeri asli supaya tidak bisa "mengklaim" path milik ruang lain).
+        // Default ke [] (bukan $oldImages) karena FormData tidak mengirim field
+        // array yang kosong sama sekali — kalau user menghapus semua foto lama
+        // tanpa menambah foto baru, 'existing_images' memang tidak akan terkirim.
+        $oldImages = is_array($room->images) ? $room->images : ($room->image ? [$room->image] : []);
+        $keepImages = array_values(array_intersect($request->input('existing_images', []), $oldImages));
 
-            $paths = [];
-            foreach ($request->file('images') as $file) {
-                $paths[] = 'storage/' . $file->store('rooms', 'public');
+        foreach ($oldImages as $img) {
+            if ($img && str_starts_with($img, 'storage/rooms/') && !in_array($img, $keepImages, true)) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $img));
             }
-            $validated['images'] = $paths;
-            $validated['image'] = $paths[0] ?? null;
         }
+
+        $newPaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $newPaths[] = 'storage/' . $file->store('rooms', 'public');
+            }
+        }
+
+        $finalImages = array_values(array_merge($keepImages, $newPaths));
+        $validated['images'] = $finalImages;
+        $validated['image'] = $finalImages[0] ?? null;
+        unset($validated['existing_images']);
 
         $room->update($validated);
 
