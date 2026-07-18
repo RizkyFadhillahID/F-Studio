@@ -62,6 +62,10 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        $revenueTrend = $this->revenueTrend();
+        $bookingStatusBreakdown = Booking::selectRaw('status, count(*) as c')->groupBy('status')->pluck('c', 'status');
+        $loanStatusBreakdown = EquipmentLoan::selectRaw('status, count(*) as c')->groupBy('status')->pluck('c', 'status');
+
         return Inertia::render('Dashboard', compact(
             'stats',
             'pendingLoans',
@@ -69,8 +73,41 @@ class DashboardController extends Controller
             'overdueLoans',
             'recentCheckIns',
             'recentBookingPayments',
-            'recentLoanPayments'
+            'recentLoanPayments',
+            'revenueTrend',
+            'bookingStatusBreakdown',
+            'loanStatusBreakdown'
         ));
+    }
+
+    /** Total pendapatan (booking + peminjaman lunas) per hari, 14 hari terakhir. */
+    private function revenueTrend(): array
+    {
+        $start = today()->subDays(13);
+
+        $bookingRevenue = Booking::where('payment_status', 'paid')
+            ->whereBetween('paid_at', [$start->copy()->startOfDay(), today()->endOfDay()])
+            ->selectRaw('DATE(paid_at) as d, SUM(amount) as total')
+            ->groupBy('d')
+            ->pluck('total', 'd');
+
+        $loanRevenue = EquipmentLoan::where('payment_status', 'paid')
+            ->whereBetween('paid_at', [$start->copy()->startOfDay(), today()->endOfDay()])
+            ->selectRaw('DATE(paid_at) as d, SUM(amount) as total')
+            ->groupBy('d')
+            ->pluck('total', 'd');
+
+        return collect(range(0, 13))
+            ->map(function ($i) use ($start, $bookingRevenue, $loanRevenue) {
+                $date = $start->copy()->addDays($i)->toDateString();
+
+                return [
+                    'date'   => $date,
+                    'amount' => (float) ($bookingRevenue[$date] ?? 0) + (float) ($loanRevenue[$date] ?? 0),
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     /** JSON endpoint untuk admin dashboard auto-polling */
