@@ -49,6 +49,7 @@ Login lewat halaman `/login` dan pilih portal yang sesuai (Admin/Resepsionis/Mem
 - **Pembatalan**, member/resepsionis bisa membatalkan transaksi yang belum dibayar.
 - **Check-in/out via API**, fitur demo terpisah yang mencatat serah-terima fisik alat (dipakai untuk menunjukkan integrasi REST API bertoken, bukan bagian alur utama UI).
 - **Dashboard**, khusus tiap peran, menampilkan ringkasan jumlah transaksi, status pembayaran, dan aktivitas terbaru.
+- **Laporan Transaksi** (admin & resepsionis), rekap pemesanan ruangan + peminjaman alat dalam satu tabel, bisa disaring per rentang tanggal/jenis/status pembayaran, dengan ringkasan total transaksi & total pendapatan, plus tombol unduh CSV. Resepsionis hanya melihat transaksi yang ia buat sendiri; admin melihat semua.
 
 ---
 
@@ -97,11 +98,11 @@ resources/
 ├── css/app.css              # Design system "Aurora" (dark glass theme)
 └── js/
     ├── Pages/                # Satu file = satu halaman Inertia, dikelompokkan per portal
-    │   ├── Auth/, Bookings/, Loans/, Equipment/, Rooms/, Users/, Categories/  (admin)
-    │   ├── Member/                                                            (portal member)
-    │   └── Receptionist/                                                      (portal resepsionis)
+    │   ├── Auth/, Bookings/, Loans/, Equipment/, Rooms/, Users/, Categories/, Reports/  (admin)
+    │   ├── Member/                                                                       (portal member)
+    │   └── Receptionist/                                                                 (portal resepsionis, termasuk Reports.vue)
     ├── Layouts/              # AppLayout.vue (admin/resepsionis, sidebar) & MemberLayout.vue (header nav)
-    ├── Components/           # Komponen reusable (Pagination, dsb)
+    ├── Components/           # Komponen reusable (Pagination, TransactionReportView, dsb)
     └── lib/                  # Helper murni JS: payment.js (kalkulasi harga), status.js (label status)
 
 routes/

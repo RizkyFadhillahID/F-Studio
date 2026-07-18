@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\EquipmentController;
 use App\Http\Controllers\Web\EquipmentLoanController;
+use App\Http\Controllers\Web\ReportController;
 use App\Http\Controllers\Web\RoomController;
 use App\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
@@ -97,6 +98,10 @@ Route::middleware(['auth', 'account.active'])->group(function () {
         Route::post('/loans', [EquipmentLoanController::class, 'store'])->name('loans.store');
         Route::post('/loans/{equipmentLoan}/status',  [EquipmentLoanController::class, 'updateStatus'])->name('loans.updateStatus');
         Route::post('/loans/{equipmentLoan}/return',  [EquipmentLoanController::class, 'processReturn'])->name('loans.return');
+
+        // Laporan Transaksi
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     });
 
     // Portal Member (semua anggota terautentikasi)
@@ -128,5 +133,9 @@ Route::middleware(['auth', 'account.active'])->group(function () {
         Route::post('/bookings/{booking}/pay', [\App\Http\Controllers\Web\ReceptionistController::class, 'payBooking'])->name('bookings.pay');
         Route::post('/bookings/{booking}/cancel', [\App\Http\Controllers\Web\ReceptionistController::class, 'cancelBooking'])->name('bookings.cancel');
         Route::post('/loans/{equipmentLoan}/pay', [\App\Http\Controllers\Web\ReceptionistController::class, 'payLoan'])->name('loans.pay');
+
+        // Laporan Transaksi (transaksi yang dibuat resepsionis ini saja)
+        Route::get('/reports', [ReportController::class, 'receptionist'])->name('reports.index');
+        Route::get('/reports/export', [ReportController::class, 'receptionistExport'])->name('reports.export');
     });
 });

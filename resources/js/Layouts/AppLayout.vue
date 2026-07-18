@@ -53,6 +53,7 @@ const icons = {
     tablet: 'M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3',
     clock: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',
     plus: 'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z',
+    chart: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z',
 };
 
 const nav = computed(() => [
@@ -69,6 +70,7 @@ const nav = computed(() => [
     { group: 'Transaksi', items: [
         { label: 'Pemesanan Ruangan', href: '/bookings', icon: icons.calendar, show: isAdmin.value },
         { label: 'Peminjaman Alat', href: '/loans', icon: icons.box, show: isAdmin.value },
+        { label: 'Laporan Transaksi', href: '/reports', icon: icons.chart, show: isAdmin.value },
     ]},
     // Manajemen Akun dipisah dari Data Master — akun pengguna beda sifat
     // dari aset fisik (ruangan/alat/kategori).
@@ -82,6 +84,7 @@ const nav = computed(() => [
         { label: 'Pemesanan Ruangan', href: '/receptionist/rooms', icon: icons.plus, show: isReceptionist.value },
         { label: 'Peminjaman Alat', href: '/receptionist/loans', icon: icons.box, show: isReceptionist.value },
         { label: 'Transaksi', href: '/receptionist/bookings', icon: icons.calendar, show: isReceptionist.value },
+        { label: 'Laporan Transaksi', href: '/receptionist/reports', icon: icons.chart, show: isReceptionist.value },
     ]},
 ].filter((section) => section.items.some((i) => i.show)));
 
