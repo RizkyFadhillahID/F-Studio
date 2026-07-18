@@ -39,7 +39,7 @@ const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('id-ID', { dateStyle:
         <section class="relative overflow-hidden rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-600/90 via-indigo-700/90 to-violet-800/90 p-8 text-white sm:p-10">
             <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"></div>
             <div class="relative max-w-xl">
-                <p class="text-sm text-indigo-200">Halo, {{ firstName }} 👋</p>
+                <p class="text-sm text-indigo-200">Halo, {{ firstName }} </p>
                 <h2 class="mt-1 text-2xl font-bold sm:text-3xl">Mau berkarya apa hari ini?</h2>
                 <p class="mt-2 text-sm text-indigo-100">Pesan ruangan atau pinjam peralatan profesional — semuanya cuma beberapa klik.</p>
                 <div class="mt-6 flex flex-wrap gap-3">
