@@ -54,7 +54,7 @@ Login lewat halaman `/login` dan pilih portal yang sesuai (Admin/Resepsionis/Mem
 
 ## 2. Informasi Teknis
 
-### 2.1 Tumpukan teknologi (tech stack)
+### 2.1 teknologi (tech stack)
 
 | Lapisan | Teknologi | Keterangan |
 |---|---|---|
@@ -71,7 +71,7 @@ Login lewat halaman `/login` dan pilih portal yang sesuai (Admin/Resepsionis/Mem
 | Testing | **PHPUnit** (Laravel test helpers) | `tests/Feature/*` |
 
 
-### 2.2 Struktur direktori penting
+### 2.2 Struktur direktori 
 
 ```
 app/
@@ -306,7 +306,7 @@ Koleksi Postman siap-pakai (berisi semua endpoint di bawah beserta contoh reques
 | POST | `/equipment-loans/{id}/approve` | Admin | Setujui peminjaman |
 | POST | `/equipment-loans/{id}/reject` | Admin | Tolak peminjaman |
 
-Endpoint di atas (5.1–5.3) tersedia dan berfungsi penuh di backend, tapi **tidak dipanggil oleh UI web utama** — Inertia mengirim data langsung lewat props, bukan lewat REST API. Endpoint check-in/out (`/check-ins`) dan notifikasi (`/notifications`) juga ada di `routes/api.php`, tapi sengaja tidak dicantumkan di sini karena saat ini tidak dipakai UI mana pun (tidak ada halaman yang memanggilnya) — murni tersedia untuk didemokan lewat Postman.
+Endpoint di atas (5.1–5.3) tersedia dan berfungsi penuh di backend, tapi **tidak dipanggil oleh UI web utama**   Inertia mengirim data langsung lewat props, bukan lewat REST API. Endpoint check-in/out (`/check-ins`) dan notifikasi (`/notifications`) juga ada di `routes/api.php`, tapi sengaja tidak dicantumkan di sini karena saat ini tidak dipakai UI mana pun (tidak ada halaman yang memanggilnya)   murni tersedia untuk didemokan lewat Postman.
 
 Definisi lengkap route ada di [`routes/api.php`](routes/api.php); implementasi ada di `app/Http/Controllers/Api/*`.
 
